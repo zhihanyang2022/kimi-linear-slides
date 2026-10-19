@@ -1,0 +1,133 @@
+% ----------------------------------------------------------------------
+% Clean beamer theme + shared TikZ vocabulary for the Kimi Linear deck.
+% ----------------------------------------------------------------------
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,decorations.pathreplacing}
+
+% A 16:9 beamer frame has only ~7cm of body height. Every diagram goes through
+% \fig, which hard-caps its height (and width) so frames cannot overflow.
+\newcommand{\fig}[2][3cm]{%
+  \begin{center}%
+  \adjustbox{max width=\linewidth,max totalheight=#1}{#2}%
+  \end{center}%
+}
+
+% ---------------------------- palette ---------------------------------
+\definecolor{ink}{RGB}{38,50,56}
+\definecolor{accent}{RGB}{214,93,14}     % section accent (metropolis-ish)
+\definecolor{gatered}{RGB}{178,34,34}    % the paper's "brickred" = gating
+\definecolor{seagreen}{RGB}{20,110,114}
+\definecolor{panel}{RGB}{245,246,247}
+\definecolor{edge}{RGB}{198,204,208}
+\definecolor{mute}{RGB}{120,132,138}
+
+\setbeamercolor{normal text}{fg=ink}
+\setbeamercolor{frametitle}{fg=ink}
+\setbeamercolor{structure}{fg=accent}
+\setbeamercolor{itemize item}{fg=accent}
+\setbeamercolor{itemize subitem}{fg=mute}
+\setbeamerfont{frametitle}{size=\large}
+\setbeamerfont{title}{size=\LARGE}
+
+% thin accent rule under every frame title
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip\vspace{1.5em}%
+  \hspace{0.9em}%
+  \begin{minipage}{0.93\paperwidth}
+    \usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}\insertframetitle\par
+  \end{minipage}%
+  \vspace{0.6em}%
+}
+
+\setbeamertemplate{footline}{%
+  \makebox[\paperwidth][r]{%
+    {\color{mute}\scriptsize\insertframenumber}\hspace*{1.2em}}%
+  \vspace*{0.5em}%
+}
+
+\setbeamertemplate{itemize item}{\raisebox{0.12em}{\tiny$\blacksquare$}}
+\setbeamertemplate{itemize subitem}{\raisebox{0.12em}{\tiny$\square$}}
+
+% ---------------------------- macros ----------------------------------
+\newcommand{\g}[1]{{\color{gatered}#1}}            % gating / decay terms
+\newcommand{\hi}[1]{{\color{accent}#1}}            % what is new on this slide
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\St}{\mathbf{S}}
+\newcommand{\Diag}{\operatorname{Diag}}
+\newcommand{\sm}{\operatorname{softmax}}
+\newcommand{\Lo}{\mathcal{L}}
+
+% a boxed side-note pinned to the bottom-right corner of a frame
+\newcommand{\cornernote}[1]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east,xshift=-1.1em,yshift=1.6em,draw=edge,fill=panel,
+          rounded corners=2pt,inner sep=5pt,font=\footnotesize,align=left]
+      at (current page.south east) {#1};
+  \end{tikzpicture}%
+}
+
+% a one-line takeaway banner
+\newcommand{\takeaway}[1]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=accent,fill=accent!6,rounded corners=3pt,inner sep=5pt,
+          text width=0.86\paperwidth,align=center] {#1};
+  \end{tikzpicture}
+  \end{center}%
+}
+
+% inline numbered badge, matching the agenda callouts
+\newcommand{\nb}[1]{\tikz[baseline=(n.base)]{\node[badge,inner sep=1pt,minimum size=3.8mm](n){#1};}}
+
+% full-bleed section divider: orange canvas, white title
+\newcommand{\sectionslide}[2]{%
+  \begingroup
+  \setbeamercolor{background canvas}{bg=accent}
+  \setbeamertemplate{footline}{}
+  \begin{frame}[plain]
+    \vspace*{\fill}
+    \begin{center}
+      {\color{white!70!accent}\normalsize #1}\\[0.7em]
+      {\color{white}\LARGE #2}
+    \end{center}
+    \vspace*{\fill}
+  \end{frame}
+  \endgroup
+}
+
+% ---------------------------- tikz styles ------------------------------
+\tikzset{
+  % VALUES (inputs / states / outputs): white fill
+  val/.style   = {draw=edge,fill=white,rounded corners=2pt,inner sep=4pt,align=center},
+  mat/.style   = {draw=edge,fill=white},
+  % PARAMETERS (learned weight matrices): shaded fill
+  wt/.style    = {draw=edge,fill=panel,rounded corners=2pt,inner sep=4pt,font=\small,align=center},
+  % operations
+  blk/.style   = {draw=edge,fill=panel,rounded corners=3pt,inner sep=6pt,align=center},
+  % data-dependent gates are values, not parameters -> white fill, red border
+  gate/.style  = {draw=gatered,fill=white,rounded corners=3pt,inner sep=5pt,
+                  font=\small,text=gatered,align=center},
+  arr/.style   = {-{Stealth[length=4pt]},draw=mute,thick},
+  % MLA vs MHA: accent = low-rank compression path (new), red = decoupled RoPE
+  newwt/.style = {wt,draw=accent,fill=accent!12,text=accent},
+  lat/.style   = {val,draw=accent,text=accent,font=\small},
+  rwt/.style   = {wt,draw=gatered,fill=gatered!12,text=gatered},
+  rval/.style  = {val,draw=gatered,text=gatered,font=\small},
+  arrnew/.style= {arr,draw=accent},
+  arrrope/.style={arr,draw=gatered},
+  badge/.style = {circle,fill=accent,text=white,inner sep=0pt,minimum size=4.6mm,
+                  font=\footnotesize\bfseries},
+  dim/.style   = {font=\footnotesize,text=mute},
+  lbl/.style   = {font=\footnotesize},
+}

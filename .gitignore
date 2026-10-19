@@ -1,0 +1,9 @@
+preview/
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.xdv
+Screenshot*.png
